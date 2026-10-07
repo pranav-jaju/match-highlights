@@ -1,0 +1,14 @@
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+data/
+output/
+models/
+cache/*
+!cache/match*.signals.csv
+*.mp4
+*.mkv
+*.m4a
+*.wav
+.DS_Store

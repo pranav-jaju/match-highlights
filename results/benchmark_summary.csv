@@ -1,0 +1,6 @@
+scorer,frame_avg_precision,frame_roc_auc,reel_recall,reel_precision,reel_f1,goal_recall,n_goals
+random,0.0215,0.5081,0.0556,0.0347,0.0427,0.0556,18
+loudness,0.1909,0.759,0.5278,0.3116,0.3849,0.5,18
+events,0.0376,0.5899,0.0833,0.031,0.0452,0.0556,18
+fusion,0.2638,0.873,0.4167,0.2444,0.2952,0.3889,18
+reaction,0.2951,0.9157,0.5833,0.2759,0.3701,0.5556,18

@@ -1,0 +1,21 @@
+budget,scorer,AP,AUC,goals,reel_prec,goal_recall
+10 min,random,0.021,0.508,2,0.02,0.111
+10 min,loudness,0.191,0.759,14,0.142,0.778
+10 min,events,0.038,0.59,1,0.009,0.056
+10 min,fusion,0.264,0.873,13,0.129,0.722
+10 min,reaction (best signal),0.295,0.916,10,0.087,0.556
+3 min,random,0.021,0.508,1,0.035,0.056
+3 min,loudness,0.191,0.759,9,0.312,0.5
+3 min,events,0.038,0.59,1,0.031,0.056
+3 min,fusion,0.264,0.873,7,0.244,0.389
+3 min,reaction (best signal),0.295,0.916,10,0.276,0.556
+5 min,random,0.021,0.508,1,0.021,0.056
+5 min,loudness,0.191,0.759,10,0.209,0.556
+5 min,events,0.038,0.59,1,0.019,0.056
+5 min,fusion,0.264,0.873,10,0.2,0.556
+5 min,reaction (best signal),0.295,0.916,10,0.165,0.556
+label-length,random,0.021,0.508,0,0.0,0.0
+label-length,loudness,0.191,0.759,8,0.444,0.444
+label-length,events,0.038,0.59,1,0.07,0.056
+label-length,fusion,0.264,0.873,6,0.351,0.333
+label-length,reaction (best signal),0.295,0.916,8,0.293,0.444

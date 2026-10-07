@@ -1,0 +1,28 @@
+[project]
+name = "matchreel"
+version = "0.1.0"
+description = "Automatic sports highlight detection from match audio: sound-event and commentary models fused and evaluated against broadcaster highlights."
+requires-python = ">=3.10"
+dependencies = [
+    "numpy<2",
+    "scipy",
+    "pandas",
+    "scikit-learn",
+    "librosa",
+    "soundfile",
+    "joblib",
+]
+
+[project.optional-dependencies]
+models = ["torch==2.2.2", "torchaudio==2.2.2", "panns-inference", "openai-whisper"]
+app = ["streamlit"]
+dev = ["pytest"]
+
+[project.scripts]
+matchreel = "matchreel.cli:main"
+
+[tool.setuptools]
+packages = ["matchreel", "matchreel.signals"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
