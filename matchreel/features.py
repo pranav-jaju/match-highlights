@@ -62,12 +62,15 @@ def build(media: str, cache_dir: str = "cache", use_events: bool = True,
             df[k] = v
     grid = df["time"].to_numpy()
 
-    if use_events and "ev_cheer" not in df:
+    emb_path = cache / f"{stem}.emb.npz"
+    if use_events and ("ev_cheer" not in df or not emb_path.exists()):
         from .signals import audio_events
-        log(f"[{stem}] sound events (PANNs CNN14)")
+        log(f"[{stem}] sound events + embeddings (PANNs CNN14)")
         a32 = load_audio(media, 32000)
         for k, v in audio_events.compute(a32, 32000, grid).items():
             df[k] = v
+        centres, emb = audio_events.compute.last
+        np.savez_compressed(emb_path, t=centres, emb=emb)
 
     if use_commentary and "com_keywords" not in df:
         from .signals import commentary

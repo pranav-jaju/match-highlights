@@ -1,0 +1,13 @@
+scorer,budget_s,roc_auc,avg_precision,goals_hit,n_goals,reel_precision,goal_recall
+random,180,0.487,0.012,1,61,0.007,0.016
+loudness,180,0.812,0.201,30,61,0.2,0.492
+sound events,180,0.544,0.017,1,61,0.006,0.016
+reaction,180,0.89,0.224,25,61,0.14,0.41
+embedding logreg,180,0.928,0.445,41,61,0.265,0.672
+embedding GBM,180,0.941,0.5,40,61,0.256,0.656
+random,300,0.487,0.012,1,61,0.005,0.016
+loudness,300,0.812,0.201,35,61,0.14,0.574
+sound events,300,0.544,0.017,2,61,0.008,0.033
+reaction,300,0.89,0.224,27,61,0.092,0.443
+embedding logreg,300,0.928,0.445,42,61,0.163,0.689
+embedding GBM,300,0.941,0.5,43,61,0.165,0.705

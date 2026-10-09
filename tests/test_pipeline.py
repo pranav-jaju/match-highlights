@@ -106,3 +106,22 @@ def test_best_signal_picks_informative_feature():
     bs = BestSignal().fit(frames, labels)
     assert bs.column.startswith("loud")
     assert bs.train_auc > 0.9
+
+
+def test_embedding_scorer_learns_held_out_match():
+    from matchreel.learned import BASE, EmbeddingScorer
+    rng = np.random.default_rng(0)
+    frames, embs, labels = [], [], []
+    for seed in range(3):
+        n = 2400
+        t = (np.arange(n) + 0.5) * 0.5
+        y = np.zeros(n, int)
+        emb = rng.random((n, 2048)).astype(np.float32)
+        for b in rng.choice(np.arange(100, n - 100), 4, replace=False):
+            y[b - 20:b + 20] = 1
+            emb[b - 20:b + 20, :50] += 2.0      # a learnable "goal sound" direction
+        df = pd.DataFrame({"time": t, **{c: rng.standard_normal(n) for c in BASE}})
+        frames.append(df); embs.append(emb); labels.append(y)
+    m = EmbeddingScorer("logreg", n_pca=8).fit(frames[:2], embs[:2], labels[:2])
+    from sklearn.metrics import roc_auc_score
+    assert roc_auc_score(labels[2], m.score(frames[2], embs[2])) > 0.9

@@ -1,0 +1,47 @@
+15 matches, 61 goals
+  match1 done
+  match2 done
+  match3 done
+  m04 done
+  m06 done
+  m07 done
+  m08 done
+  m09 done
+  m10 done
+  m11 done
+  m13 done
+  m14 done
+  m15 done
+  m16 done
+  m17 done
+          scorer  budget_s  roc_auc  avg_precision  goals_hit  n_goals  reel_precision  goal_recall
+          random       180    0.487          0.012          1       61           0.007        0.016
+        loudness       180    0.812          0.201         30       61           0.200        0.492
+    sound events       180    0.544          0.017          1       61           0.006        0.016
+        reaction       180    0.890          0.224         25       61           0.140        0.410
+embedding logreg       180    0.928          0.445         41       61           0.265        0.672
+   embedding GBM       180    0.941          0.500         40       61           0.256        0.656
+          random       300    0.487          0.012          1       61           0.005        0.016
+        loudness       300    0.812          0.201         35       61           0.140        0.574
+    sound events       300    0.544          0.017          2       61           0.008        0.033
+        reaction       300    0.890          0.224         27       61           0.092        0.443
+embedding logreg       300    0.928          0.445         42       61           0.163        0.689
+   embedding GBM       300    0.941          0.500         43       61           0.165        0.705
+             metric  budget_s            model       vs  mean_diff  ci_low  ci_high
+      frame_roc_auc       180 embedding logreg reaction      0.038   0.009    0.069
+      frame_roc_auc       180    embedding GBM reaction      0.052   0.019    0.088
+      frame_roc_auc       180 embedding logreg loudness      0.115   0.090    0.145
+      frame_roc_auc       180    embedding GBM loudness      0.129   0.102    0.158
+frame_avg_precision       180 embedding logreg reaction      0.222   0.134    0.309
+frame_avg_precision       180    embedding GBM reaction      0.275   0.198    0.354
+frame_avg_precision       180 embedding logreg loudness      0.245   0.171    0.319
+frame_avg_precision       180    embedding GBM loudness      0.299   0.232    0.363
+        goal_recall       180 embedding logreg reaction      0.264   0.155    0.383
+        goal_recall       180    embedding GBM reaction      0.247   0.118    0.355
+        goal_recall       180 embedding logreg loudness      0.181   0.077    0.292
+        goal_recall       180    embedding GBM loudness      0.164   0.018    0.296
+        goal_recall       300 embedding logreg reaction      0.247   0.140    0.357
+        goal_recall       300    embedding GBM reaction      0.264   0.164    0.357
+        goal_recall       300 embedding logreg loudness      0.114   0.015    0.226
+        goal_recall       300    embedding GBM loudness      0.129  -0.015    0.262
+BENCH_DONE

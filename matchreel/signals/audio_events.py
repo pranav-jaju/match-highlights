@@ -53,12 +53,14 @@ def tag_windows(audio: np.ndarray, win_s: float = 2.0, hop_s: float = 1.0,
     if len(audio) < win:
         audio = np.pad(audio, (0, win - len(audio)))
     starts = np.arange(0, len(audio) - win + 1, hop)
-    probs = []
+    probs, embs = [], []
     for i in range(0, len(starts), batch):
         chunk = np.stack([audio[s:s + win] for s in starts[i:i + batch]])
-        clipwise, _ = model.inference(chunk)
+        clipwise, emb = model.inference(chunk)
         probs.append(clipwise)
+        embs.append(emb.astype(np.float16))
     centres = (starts + win / 2) / PANNS_SR
+    tag_windows.last_embeddings = np.concatenate(embs)   # (n_windows, 2048)
     return centres, np.concatenate(probs)
 
 
@@ -66,6 +68,7 @@ def compute(audio: np.ndarray, sr: int, grid: np.ndarray) -> dict[str, np.ndarra
     if sr != PANNS_SR:
         raise ValueError(f"audio_events expects {PANNS_SR} Hz audio, got {sr}")
     centres, probs = tag_windows(audio)
+    compute.last = (centres, tag_windows.last_embeddings)
     out = {}
     for feat, cols in _class_indices().items():
         if cols:

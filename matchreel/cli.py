@@ -91,7 +91,15 @@ def cmd_run(a):
     df = features.build(a.media, a.cache, use_events=a.scorer != "loudness",
                         use_commentary=a.scorer == "fusion")
     t = df["time"].to_numpy()
-    score = FusionModel.load(a.model).score(df) if a.scorer == "fusion" else SCORERS[a.scorer](df)
+    if a.scorer == "learned":
+        import joblib
+        from .learned import load_embeddings
+        model = joblib.load(a.learned_model)
+        score = model.score(df, load_embeddings(Path(a.media).stem, t, a.cache))
+    elif a.scorer == "fusion":
+        score = FusionModel.load(a.model).score(df)
+    else:
+        score = SCORERS[a.scorer](df)
     clips = select(t, score, a.budget, pre_s=a.pre, post_s=a.post)
     for c in clips:
         print(f"  {c.start:8.1f}s - {c.end:8.1f}s  (peak {c.peak:.1f}s, score {c.score:.3f})")
@@ -216,7 +224,8 @@ def main(argv=None):
     r.add_argument("media")
     r.add_argument("--out", default="output/highlights.mp4")
     r.add_argument("--budget", type=float, default=300, help="reel length in seconds")
-    r.add_argument("--scorer", choices=["loudness", "events", "fusion"], default="fusion")
+    r.add_argument("--scorer", choices=["learned", "loudness", "events", "fusion"], default="learned")
+    r.add_argument("--learned-model", default="models/embedding_gbm.joblib")
     r.add_argument("--model", default="models/fusion.joblib")
     r.add_argument("--pre", type=float, default=12.0)
     r.add_argument("--post", type=float, default=8.0)

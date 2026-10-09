@@ -1,52 +1,72 @@
+![tests](https://github.com/pranav-jaju/matchreel/actions/workflows/tests.yml/badge.svg)
+
 # matchreel
 
-**Automatic football highlights from match audio, evaluated against hand-verified goal times.**
+**Automatic football highlights from broadcast audio, evaluated on 15 held-out matches.**
 
-matchreel listens to a full broadcast, scores every half-second for "excitement", and cuts the top moments into a highlight reel of any length. It compares four scoring approaches (crowd loudness, a pretrained AudioSet sound-event model, commentary transcription, and learned combinations of them) on held-out matches.
+matchreel listens to a full match, scores every half-second for "is a goal happening here?", and cuts the top moments into a highlight reel of any length. The best model is a gradient-boosted classifier on **PANNs CNN14 audio embeddings**. In a 3-minute reel it captures **66% of goals versus 49% for crowd loudness**, on matches it was never trained on.
 
-![Excitement curves for Betis 3-5 Barcelona](results/match2_excitement.png)
-*Betis 3–5 Barcelona: red lines = the 8 goals, green = clips each scorer chose for a 3-minute reel.*
+![Goal recall vs reel length](results/v2/recall_vs_budget.png)
 
 ## Results
 
-3 full LaLiga broadcasts (5.3 hours, 18 goals), **leave-one-match-out**: every learned scorer is evaluated only on a match it never saw.
+**Data:** 15 full LaLiga broadcasts (26.8 hours of audio, 61 goals).
+**Protocol:** leave-one-match-out. Every model is trained on 14 matches and scored on the 15th, which it has never seen, and this is rotated through all 15.
 
-| Scorer | ROC-AUC | Avg. precision | Goals in a 3-min reel | Goals in a 10-min reel |
+| Scorer | ROC-AUC | Avg. precision | Goals in 3-min reel | Goals in 5-min reel |
 |---|---:|---:|---:|---:|
-| Random | 0.51 | 0.02 | 1 / 18 | 2 / 18 |
-| Loudness (crowd volume) | 0.76 | 0.19 | 9 / 18 | **14 / 18** |
-| Sound events (PANNs CNN14, AudioSet) | 0.59 | 0.04 | 1 / 18 | 1 / 18 |
-| Fusion (logistic regression, 30 features) | 0.87 | 0.26 | 7 / 18 | 13 / 18 |
-| **Reaction (best signal, chosen on training matches)** | **0.92** | **0.30** | **10 / 18** | 10 / 18 |
+| Random | 0.49 | 0.01 | 1 / 61 | 1 / 61 |
+| Pretrained sound events (AudioSet "cheering", "crowd"…) | 0.54 | 0.02 | 1 / 61 | 2 / 61 |
+| Crowd loudness | 0.81 | 0.20 | 30 / 61 (49%) | 35 / 61 (57%) |
+| Reaction (loudest point in the next 15 s) | 0.89 | 0.22 | 25 / 61 | 27 / 61 |
+| **Embedding logistic regression** | 0.93 | 0.45 | **41 / 61 (67%)** | 42 / 61 (69%) |
+| **Embedding gradient boosting** | **0.94** | **0.50** | 40 / 61 (66%) | **43 / 61 (70%)** |
 
-ROC-AUC and average precision measure how well each half-second frame is ranked (a frame is positive if it lies within ±10 s of a goal). Goal recall counts goals whose moment falls inside the generated reel. Full tables: [`results/benchmark_full.csv`](results/benchmark_full.csv), per-signal ablation: [`results/signal_auc.csv`](results/signal_auc.csv).
+ROC-AUC and average precision rank every half-second frame (positive = within ±10 s of a goal). Goal recall counts goals whose moment is inside the generated reel.
 
-**What we learned**
+**Is the improvement real?** Paired bootstrap over matches (5000 resamples, 95% CI) of embedding GBM minus loudness:
 
-- **The crowd reacts *after* the goal.** The single most predictive signal is the loudest moment in the *next* 15 seconds (AUC 0.92), not the loudness at the moment itself (0.64). Selected independently on each training split, it was the same feature every time.
-- **More features overfit.** With only two training matches per split, the 30-feature fusion model ranks frames better than raw loudness but loses to the single "reaction" feature.
-- **A generic pretrained audio tagger is not enough.** PANNs' cheering/crowd probabilities barely beat chance on broadcast audio, where commentary and constant crowd noise dominate. Its "shout" class is its most useful output (AUC 0.75).
-- **Limits.** 3 matches and 18 goals is a small sample; differences of 1–2 goals are within noise. Goal-recall rankings change with reel length (loudness wins at 10 min, reaction at 3 min).
+| Metric | Difference | 95% CI |
+|---|---:|---|
+| Average precision | +0.30 | [+0.23, +0.36] |
+| ROC-AUC | +0.13 | [+0.10, +0.16] |
+| Goal recall, 3-min reel | +0.16 | [+0.02, +0.30] |
+| Goal recall, 5-min reel | +0.13 | [−0.02, +0.26] (not significant) |
 
-## How the labels were made (independently of the audio)
+Full tables: [`results/v2/summary.csv`](results/v2/summary.csv), [`results/v2/bootstrap.csv`](results/v2/bootstrap.csv), per match: [`results/v2/per_match.csv`](results/v2/per_match.csv).
 
-The models only ever see the audio, so the ground truth comes from the video:
+![Excitement curves](results/v2/match2_excitement.png)
+*Betis 3–5 Barcelona, scored by a model that never saw it. Red = goals, green = clips chosen for a 3-minute reel.*
 
-1. `tools/scoreboard_goals.py` reads the on-screen score with OCR (EasyOCR) every 2 s and finds when it changes.
-2. Each goal's exact moment (ball crossing the line) was then confirmed by eye on frame contact sheets from `tools/contact_sheet.py`, since broadcasters update the score a few seconds late. Every final score matched.
+### What we learned
 
-Labels: [`labels/`](labels). Features computed from the audio: [`cache/`](cache).
+- **Generic sound-event classes don't transfer to broadcasts.** AudioSet's "cheering" and "crowd" probabilities are near chance, because a stadium is *always* a crowd. But the **same network's 2048-d embedding**, reduced to 32 principal components and given a classifier, more than doubles average precision over loudness. The useful information is in the representation, not in the label set it was trained for.
+- **The crowd reacts after the goal.** Loudness over the *next* 15 s (AUC 0.89) is a far better feature than loudness at that moment (0.64 in the pilot). Every model gets look-ahead context, which is valid because highlights are cut offline.
+- **Few features beat many when data is scarce.** In the 3-match pilot (below), a 30-feature model overfit and lost to a single feature. With 15 matches, the learned models win clearly.
+- **Limits.** One club's broadcasts (Barcelona, LaLiga), goals only (no saves, chances or cards), and differences of a few goals are within noise at long reel lengths.
+
+## Ground truth without listening: reading the scoreboard
+
+The models only see audio, so the labels come from the video:
+
+1. **Hand-verified pilot:** the 18 goals of 3 matches were located frame by frame (`tools/contact_sheet.py`).
+2. **Automatic labels for the rest** (`tools/scoreboard_auto.py`):
+   - read the score digits of the broadcast graphic once per second, using shift-tolerant glyph templates built from the pilot
+   - accept a goal only when the score goes up by exactly one and stays there
+   - subtract the scoreboard delay, measured on the 14 pilot goals with this graphic (median 4.5 s)
+3. **Validation gate:** a match is used only if the reading reproduces the final score in the video title for both teams. 12 of 14 matches passed. Two were rejected and left out rather than patched: one where the graphic was rarely detected, and one with a phantom read. [`meta/label_status.csv`](meta/label_status.csv)
 
 ## Pipeline
 
 ```
 audio ─┬─ loudness: RMS dB, robust z-score, rise vs. previous 10 s
-       ├─ sound events: PANNs CNN14 on 2 s windows -> cheer / crowd / shout / whistle / music / speech
-       └─ commentary: Whisper base.en transcript -> excitement-phrase score, words per second
+       ├─ PANNs CNN14 (AudioSet) on 2 s windows: 6 class probabilities + 2048-d embedding
+       └─ (pilot only) Whisper commentary: excitement phrases, speech rate
           │
+          ├─ embedding -> PCA(32), fitted on training matches only
           ├─ context features: max over the next 15 s, mean over ±5 s
-          ├─ scorer -> excitement curve
-          └─ peak picking (≥30 s apart) -> clips [peak−12 s, peak+8 s] -> merge -> fit reel budget -> ffmpeg render
+          ├─ classifier (logistic regression / gradient boosting, fixed hyper-parameters)
+          └─ peak picking (≥30 s apart) -> clips [peak−12 s, peak+8 s] -> merge -> fit reel budget -> ffmpeg
 ```
 
 ## Usage
@@ -54,26 +74,22 @@ audio ─┬─ loudness: RMS dB, robust z-score, rise vs. previous 10 s
 ```bash
 pip install -e ".[models,app,dev]"
 
-python -m matchreel features match.mp4                     # compute and cache all signals
-python -m matchreel run match.mp4 --budget 300 --scorer loudness --out reel.mp4
-python -m matchreel labels labels/match1.events.csv         # time,type,note -> label files
-python -m matchreel benchmark data/match*.m4a --budget 180  # leave-one-match-out comparison
-python -m matchreel plot data/match*.m4a                    # excitement curves
-streamlit run app.py                                         # upload a match, get a reel
-pytest                                                       # 7 tests on synthetic audio
+python -m matchreel run match.mp4 --budget 300 --out reel.mp4      # learned model (models/embedding_gbm.joblib)
+python -m matchreel run match.mp4 --scorer loudness                 # no ML baseline
+python tools/process_match.py m04                                   # auto-label + features for a manifest match
+python experiments/benchmark_v2.py                                  # leave-one-match-out benchmark + bootstrap
+python experiments/make_figures.py                                  # figures + demo reel from held-out scores
+streamlit run app.py                                                # upload a match, get a reel
+pytest                                                              # 8 tests on synthetic data
 ```
 
-## Reproducing the results
+## Data
 
-The videos aren't redistributed. The matches are official FC Barcelona YouTube uploads:
+The matches are FC Barcelona's official YouTube full-match uploads, listed in [`meta/matches.csv`](meta/matches.csv). Videos and audio are not redistributed. The repository contains the goal labels, the per-frame held-out scores of every model ([`results/v2/scores/`](results/v2/scores)) and all result tables, so every number above can be re-checked without the media. Processing from scratch takes about 25 min per match on a laptop CPU.
 
-| | Match | YouTube ID |
-|---|---|---|
-| match1 | Real Madrid 0–4 Barcelona (2015) | `QS3IEsVgUKs` |
-| match2 | Betis 3–5 Barcelona (2025/26) | `93LPZJkCW2w` |
-| match3 | Barcelona 6–0 Valencia (2025/26) | `ymCoJm9RXbY` |
+## Pilot (3 matches, hand labels)
 
-With the committed `cache/` and `labels/`, `python -m matchreel benchmark data/match1.m4a data/match2.m4a data/match3.m4a --budget 180` reproduces the table without downloading anything (only the file names are used to find cached features). Feature extraction from scratch takes about 15–18 min per match on a laptop CPU.
+The first version used 3 matches and added Whisper commentary features. There, the best scorer was simply loudness over the next 15 s (AUC 0.92), and a 30-feature model overfit. Those results ([`results/benchmark_full.csv`](results/benchmark_full.csv)) motivated scaling the data before trusting any learned model.
 
 ## Credits
 

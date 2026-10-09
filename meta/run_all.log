@@ -1,0 +1,5 @@
+== m16 01:16
+{'name': 'm16', 'accepted': True, 'home_read': '3/3', 'away_read': '0/0', 'digit_read_rate': 0.996}
+== m17 02:00
+{'name': 'm17', 'accepted': True, 'home_read': '2/2', 'away_read': '4/4', 'digit_read_rate': 0.982}
+ALL_DONE

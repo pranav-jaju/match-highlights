@@ -1,0 +1,17 @@
+metric,budget_s,model,vs,mean_diff,ci_low,ci_high
+frame_roc_auc,180,embedding logreg,reaction,0.038,0.009,0.069
+frame_roc_auc,180,embedding GBM,reaction,0.052,0.019,0.088
+frame_roc_auc,180,embedding logreg,loudness,0.115,0.09,0.145
+frame_roc_auc,180,embedding GBM,loudness,0.129,0.102,0.158
+frame_avg_precision,180,embedding logreg,reaction,0.222,0.134,0.309
+frame_avg_precision,180,embedding GBM,reaction,0.275,0.198,0.354
+frame_avg_precision,180,embedding logreg,loudness,0.245,0.171,0.319
+frame_avg_precision,180,embedding GBM,loudness,0.299,0.232,0.363
+goal_recall,180,embedding logreg,reaction,0.264,0.155,0.383
+goal_recall,180,embedding GBM,reaction,0.247,0.118,0.355
+goal_recall,180,embedding logreg,loudness,0.181,0.077,0.292
+goal_recall,180,embedding GBM,loudness,0.164,0.018,0.296
+goal_recall,300,embedding logreg,reaction,0.247,0.14,0.357
+goal_recall,300,embedding GBM,reaction,0.264,0.164,0.357
+goal_recall,300,embedding logreg,loudness,0.114,0.015,0.226
+goal_recall,300,embedding GBM,loudness,0.129,-0.015,0.262
