@@ -8,6 +8,18 @@ matchreel listens to a full match, scores every half-second for "is a goal happe
 
 ![Goal recall vs reel length](results/v2/recall_vs_budget.png)
 
+## Quick start
+
+Requires Python 3.10+ and [ffmpeg](https://ffmpeg.org/download.html) (`brew install ffmpeg` on macOS).
+
+```bash
+git clone https://github.com/pranav-jaju/matchreel && cd matchreel
+pip install -e ".[models]"
+matchreel run my_match.mp4 --budget 300 --out highlights.mp4   # 5-minute reel
+```
+
+The trained model ships with the repo; the PANNs audio network (~330 MB) downloads automatically on first run. A full 90-minute match takes about 10 minutes on a laptop CPU. Add `--timestamps-only` to print the clip times without rendering video.
+
 ## Results
 
 **Data:** 15 full LaLiga broadcasts (26.8 hours of audio, 61 goals).
