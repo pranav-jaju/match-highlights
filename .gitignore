@@ -4,7 +4,8 @@ __pycache__/
 *.egg-info/
 data/
 output/
-models/
+models/*
+!models/embedding_gbm.joblib
 cache/*
 !cache/match*.signals.csv
 *.mp4

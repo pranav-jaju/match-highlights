@@ -7,14 +7,15 @@ dependencies = [
     "numpy<2",
     "scipy",
     "pandas",
-    "scikit-learn",
+    "scikit-learn>=1.9,<1.10",  # the shipped model was trained with 1.9
     "librosa",
     "soundfile",
     "joblib",
+    "matplotlib",
 ]
 
 [project.optional-dependencies]
-models = ["torch==2.2.2", "torchaudio==2.2.2", "panns-inference", "openai-whisper"]
+models = ["torch>=2.2", "torchaudio>=2.2", "panns-inference", "openai-whisper"]
 app = ["streamlit"]
 dev = ["pytest"]
 

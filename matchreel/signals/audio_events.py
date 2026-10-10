@@ -7,6 +7,8 @@ per-second probabilities for cheering, crowd, applause, music and speech.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 
 from ..audio import to_grid
@@ -26,16 +28,41 @@ CLASS_GROUPS = {
 _model = None
 
 
+PANNS_FILES = {
+    "class_labels_indices.csv":
+        "http://storage.googleapis.com/us_audioset/youtube_corpus/v1/csv/class_labels_indices.csv",
+    "Cnn14_mAP=0.431.pth":
+        "https://zenodo.org/record/3987831/files/Cnn14_mAP%3D0.431.pth?download=1",
+}
+
+
+def ensure_panns_files() -> Path:
+    """panns_inference downloads with `wget`, which many machines lack; fetch
+    the AudioSet label list and CNN14 checkpoint (~330 MB) with urllib instead."""
+    import urllib.request
+
+    root = Path.home() / "panns_data"
+    root.mkdir(exist_ok=True)
+    for name, url in PANNS_FILES.items():
+        dest = root / name
+        if not dest.exists() or dest.stat().st_size == 0:
+            print(f"downloading {name} ...", flush=True)
+            urllib.request.urlretrieve(url, dest)
+    return root
+
+
 def _get_model():
     global _model
     if _model is None:
+        root = ensure_panns_files()
         from panns_inference import AudioTagging  # heavy import, keep lazy
 
-        _model = AudioTagging(checkpoint_path=None, device="cpu")
+        _model = AudioTagging(checkpoint_path=str(root / "Cnn14_mAP=0.431.pth"), device="cpu")
     return _model
 
 
 def _class_indices() -> dict[str, list[int]]:
+    ensure_panns_files()
     from panns_inference import labels
 
     idx = {name: i for i, name in enumerate(labels)}
