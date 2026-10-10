@@ -1,4 +1,4 @@
-"""matchreel: automatic sports highlight detection from match audio.
+"""match-highlights: automatic sports highlight detection from match audio.
 
 Pipeline: audio -> per-frame signals (loudness, sound events, commentary)
 -> excitement score -> peak events -> highlight reel.

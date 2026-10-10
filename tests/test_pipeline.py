@@ -4,13 +4,13 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from matchreel.align import SR as ALIGN_SR, logmel, match_chunks, to_segments
-from matchreel.audio import frame_times
-from matchreel.evaluate import evaluate, frame_labels, reel_metrics
-from matchreel.reel import Clip, merge, select
-from matchreel.scoring import FusionModel, score_loudness
-from matchreel.signals import loudness
-from matchreel.signals.commentary import phrase_score, segments_to_grid
+from match_highlights.align import SR as ALIGN_SR, logmel, match_chunks, to_segments
+from match_highlights.audio import frame_times
+from match_highlights.evaluate import evaluate, frame_labels, reel_metrics
+from match_highlights.reel import Clip, merge, select
+from match_highlights.scoring import FusionModel, score_loudness
+from match_highlights.signals import loudness
+from match_highlights.signals.commentary import phrase_score, segments_to_grid
 
 SR = 16000
 
@@ -96,7 +96,7 @@ def test_fusion_learns_on_synthetic_matches():
 
 
 def test_best_signal_picks_informative_feature():
-    from matchreel.scoring import BestSignal
+    from match_highlights.scoring import BestSignal
     frames, labels = [], []
     for seed in range(2):
         bursts = (80, 300, 500)
@@ -109,7 +109,7 @@ def test_best_signal_picks_informative_feature():
 
 
 def test_embedding_scorer_learns_held_out_match():
-    from matchreel.learned import BASE, EmbeddingScorer
+    from match_highlights.learned import BASE, EmbeddingScorer
     rng = np.random.default_rng(0)
     frames, embs, labels = [], [], []
     for seed in range(3):

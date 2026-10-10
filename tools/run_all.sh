@@ -2,7 +2,7 @@
 # Process every manifest match whose video is present: labels (auto) + features.
 cd /Users/macbook/ResumeSelfProject
 for m in match1 match2 match3; do
-  [ -f cache/$m.emb.npz ] || .venv/bin/python -m matchreel features data/$m.m4a --no-commentary 2>&1 | grep -E "^\[|Error|Traceback"
+  [ -f cache/$m.emb.npz ] || .venv/bin/python -m match_highlights features data/$m.m4a --no-commentary 2>&1 | grep -E "^\[|Error|Traceback"
 done
 while true; do
   todo=()

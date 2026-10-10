@@ -14,9 +14,9 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, ".")
-from matchreel.evaluate import evaluate, frame_labels, load_segments  # noqa: E402
-from matchreel.learned import BASE, EmbeddingScorer, load_embeddings  # noqa: E402
-from matchreel.scoring import BestSignal, score_events, score_loudness, score_random  # noqa: E402
+from match_highlights.evaluate import evaluate, frame_labels, load_segments  # noqa: E402
+from match_highlights.learned import BASE, EmbeddingScorer, load_embeddings  # noqa: E402
+from match_highlights.scoring import BestSignal, score_events, score_loudness, score_random  # noqa: E402
 
 OUT = Path("results/v2")
 BUDGETS = [180, 300]

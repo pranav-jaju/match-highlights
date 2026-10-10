@@ -1,10 +1,10 @@
-![tests](https://github.com/pranav-jaju/matchreel/actions/workflows/tests.yml/badge.svg)
+![tests](https://github.com/pranav-jaju/match-highlights/actions/workflows/tests.yml/badge.svg)
 
-# matchreel
+# match-highlights
 
 **Automatic football highlights from broadcast audio, evaluated on 15 held-out matches.**
 
-matchreel listens to a full match, scores every half-second for "is a goal happening here?", and cuts the top moments into a highlight reel of any length. The best model is a gradient-boosted classifier on **PANNs CNN14 audio embeddings**. In a 3-minute reel it captures **66% of goals versus 49% for crowd loudness**, on matches it was never trained on.
+match-highlights listens to a full match, scores every half-second for "is a goal happening here?", and cuts the top moments into a highlight reel of any length. The best model is a gradient-boosted classifier on **PANNs CNN14 audio embeddings**. In a 3-minute reel it captures **66% of goals versus 49% for crowd loudness**, on matches it was never trained on.
 
 ![Goal recall vs reel length](results/v2/recall_vs_budget.png)
 
@@ -13,9 +13,9 @@ matchreel listens to a full match, scores every half-second for "is a goal happe
 Requires Python 3.10+ and [ffmpeg](https://ffmpeg.org/download.html) (`brew install ffmpeg` on macOS).
 
 ```bash
-git clone https://github.com/pranav-jaju/matchreel && cd matchreel
+git clone https://github.com/pranav-jaju/match-highlights && cd match-highlights
 pip install -e ".[models]"
-matchreel run my_match.mp4 --budget 300 --out highlights.mp4   # 5-minute reel
+match-highlights run my_match.mp4 --budget 300 --out highlights.mp4   # 5-minute reel
 ```
 
 The trained model ships with the repo; the PANNs audio network (~330 MB) downloads automatically on first run. A full 90-minute match takes about 10 minutes on a laptop CPU. Add `--timestamps-only` to print the clip times without rendering video.
@@ -86,8 +86,8 @@ audio ─┬─ loudness: RMS dB, robust z-score, rise vs. previous 10 s
 ```bash
 pip install -e ".[models,app,dev]"
 
-python -m matchreel run match.mp4 --budget 300 --out reel.mp4      # learned model (models/embedding_gbm.joblib)
-python -m matchreel run match.mp4 --scorer loudness                 # no ML baseline
+python -m match_highlights run match.mp4 --budget 300 --out reel.mp4      # learned model (models/embedding_gbm.joblib)
+python -m match_highlights run match.mp4 --scorer loudness                 # no ML baseline
 python tools/process_match.py m04                                   # auto-label + features for a manifest match
 python experiments/benchmark_v2.py                                  # leave-one-match-out benchmark + bootstrap
 python experiments/make_figures.py                                  # figures + demo reel from held-out scores
@@ -105,4 +105,4 @@ The first version used 3 matches and added Whisper commentary features. There, t
 
 ## Credits
 
-The idea that crowd noise marks a match's best moments was inspired by a highlights script by IIT Bombay seniors Sufiyan and Syed. matchreel is an independent implementation. Pretrained models: [PANNs](https://github.com/qiuqiangkong/panns_inference) (Kong et al., 2020) and [Whisper](https://github.com/openai/whisper) (Radford et al., 2022).
+The idea that crowd noise marks a match's best moments was inspired by a highlights script by IIT Bombay seniors Sufiyan and Syed. match-highlights is an independent implementation. Pretrained models: [PANNs](https://github.com/qiuqiangkong/panns_inference) (Kong et al., 2020) and [Whisper](https://github.com/openai/whisper) (Radford et al., 2022).

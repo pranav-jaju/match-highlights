@@ -16,7 +16,7 @@ import pandas as pd
 sys.path.insert(0, "tools")
 sys.path.insert(0, ".")
 import scoreboard_auto as sa  # noqa: E402
-from matchreel import features  # noqa: E402
+from match_highlights import features  # noqa: E402
 
 DELAY_S = 4.5          # median scoreboard delay measured on 14 hand-verified goals
 HALF_WINDOW = 10.0     # highlight segment = goal +- 10 s (same as hand labels)

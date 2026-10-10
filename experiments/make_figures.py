@@ -13,9 +13,9 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
 sys.path.insert(0, ".")
-from matchreel.evaluate import evaluate  # noqa: E402
-from matchreel.plot import excitement_plot  # noqa: E402
-from matchreel.reel import render, select  # noqa: E402
+from match_highlights.evaluate import evaluate  # noqa: E402
+from match_highlights.plot import excitement_plot  # noqa: E402
+from match_highlights.reel import render, select  # noqa: E402
 
 OUT = "results/v2"
 summary = pd.read_csv(f"{OUT}/summary.csv")

@@ -1,4 +1,4 @@
-"""Command-line interface: python -m matchreel <command> ..."""
+"""Command-line interface: python -m match_highlights <command> ..."""
 
 from __future__ import annotations
 
@@ -178,7 +178,7 @@ def cmd_soccernet(a):
 
 
 def main(argv=None):
-    p = argparse.ArgumentParser(prog="matchreel", description=__doc__)
+    p = argparse.ArgumentParser(prog="match-highlights", description=__doc__)
     p.add_argument("--cache", default="cache")
     sub = p.add_subparsers(dest="cmd", required=True)
 

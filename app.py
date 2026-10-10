@@ -9,12 +9,12 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from matchreel import features
-from matchreel.reel import render, select
-from matchreel.scoring import SCORERS, FusionModel
+from match_highlights import features
+from match_highlights.reel import render, select
+from match_highlights.scoring import SCORERS, FusionModel
 
-st.set_page_config(page_title="matchreel", layout="wide")
-st.title("matchreel: automatic match highlights")
+st.set_page_config(page_title="match-highlights", layout="wide")
+st.title("match-highlights: automatic match highlights")
 
 upload = st.file_uploader("Match video", type=["mp4", "mkv", "mov", "webm"])
 col1, col2, col3 = st.columns(3)
