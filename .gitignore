@@ -12,3 +12,4 @@ cache/*
 *.m4a
 *.wav
 .DS_Store
+meta/*.log
